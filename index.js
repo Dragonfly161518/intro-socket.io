@@ -6,15 +6,12 @@ app.get("/", (req, res) => {
 });
 
 io.on("connection", socket => {
-  console.log("a user connected");
-  socket.broadcast.emit("hi");
-
-  socket.on("chat message", function(msg) {
-    io.emit("chat message", msg);
+  socket.on("chat message", (user, msg) => {
+    io.emit("chat message", user + ": " + msg);
   });
 
-  socket.on("disconnect", () => {
-    console.log("user disconnect");
+  socket.on("typing", user => {
+    socket.broadcast.emit("typing", `${user} is typing`);
   });
 });
 

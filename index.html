@@ -41,11 +41,26 @@
       #messages li:nth-child(odd) {
         background: #eee;
       }
+      input {
+        border: #000 1px solid !important;
+      }
+      #typing {
+        color: grey;
+        font-style: italic;
+        background: white !important;
+      }
     </style>
   </head>
   <body>
     <ul id="messages"></ul>
+    <div id="feedback"></div>
     <form action="">
+      <input id="user" autocomplete="off" /><button
+        disabled
+        style="background: white"
+      >
+        Name
+      </button>
       <input id="m" autocomplete="off" /><button>Send</button>
     </form>
     <script src="/socket.io/socket.io.js"></script>
@@ -55,12 +70,19 @@
         var socket = io();
         $("form").submit(e => {
           e.preventDefault(); // prevents page reloading
-          socket.emit("chat message", $("#m").val());
+          socket.emit("chat message", $("#user").val(), $("#m").val());
           $("#m").val("");
           return false;
         });
+        $("#m").keypress(e => {
+          socket.emit("typing", $("#user").val());
+        });
         socket.on("chat message", msg => {
+          $("#feedback").html("");
           $("#messages").append($("<li>").text(msg));
+        });
+        socket.on("typing", msg => {
+          $("#feedback").html(msg);
         });
       });
     </script>
